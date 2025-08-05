@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-g">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt Lens</title>
     <!-- Favicon using inline SVG -->
@@ -20,16 +20,42 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        /* New Animated Gradient Background */
-        .animated-gradient {
-            background: linear-gradient(300deg, #4f46e5, #7c3aed, #db2777, #10b981);
-            background-size: 200% 200%;
-            animation: gradient-animation 20s ease infinite;
+        /* Animated Shapes Background */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(300deg, #1e1b4b, #4c1d95, #0f172a);
+            z-index: -1;
         }
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .shape {
+            position: absolute;
+            display: block;
+            list-style: none;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 25s linear infinite;
+            bottom: -200px; /* Start below the screen */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .shape.circle { border-radius: 50%; }
+        .shape.square { border-radius: 0; }
+
+        .shape:nth-child(1){ left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .shape:nth-child(2){ left: 10%; width: 30px; height: 30px; animation-delay: 2s; animation-duration: 17s; }
+        .shape:nth-child(3){ left: 70%; width: 25px; height: 25px; animation-delay: 4s; }
+        .shape:nth-child(4){ left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 22s; }
+        .shape:nth-child(5){ left: 65%; width: 20px; height: 20px; animation-delay: 1s; }
+        .shape:nth-child(6){ left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .shape:nth-child(7){ left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .shape:nth-child(8){ left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .shape:nth-child(9){ left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .shape:nth-child(10){ left: 85%; width: 160px; height: 160px; animation-delay: 0s; animation-duration: 15s; }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
         }
         #video-stream { width: 100%; height: 100%; object-fit: cover; }
         #file-input { display: none; }
@@ -38,7 +64,6 @@
             height: 1.25rem;
             margin-right: 0.75rem;
         }
-        /* Fade-in animation for the main card */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-1rem); }
             to { opacity: 1; transform: translateY(0); }
@@ -46,27 +71,22 @@
         .fade-in-up {
             animation: fadeIn 0.6s ease-out forwards;
         }
-        /* Pulse animation for the placeholder icon */
-        @keyframes pulse {
-            50% { opacity: .5; }
-        }
-        .animate-pulse-slow {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
     </style>
 </head>
-<body class="animated-gradient flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
+    
+    <div class="background-container">
+        <div class="shape circle"></div><div class="shape square"></div><div class="shape circle"></div>
+        <div class="shape square"></div><div class="shape circle"></div><div class="shape square"></div>
+        <div class="shape circle"></div><div class="shape square"></div><div class="shape circle"></div>
+        <div class="shape square"></div>
+    </div>
 
     <div class="w-full max-w-md mx-auto bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden fade-in-up">
         <!-- Header with Logo -->
         <div class="p-6 bg-gradient-to-br from-indigo-600 to-purple-700 text-white flex flex-col items-center justify-center space-y-2">
             <div class="flex items-center space-x-3">
-                <!-- SVG Logo -->
-                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.2"/>
-                    <circle cx="12" cy="12" r="6" fill="white"/>
-                    <path d="M15 9C15 7.34315 13.6569 6 12 6C10.3431 6 9 7.34315 9 9" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.2"/><circle cx="12" cy="12" r="6" fill="white"/><path d="M15 9C15 7.34315 13.6569 6 12 6C10.3431 6 9 7.34315 9 9" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round"/></svg>
                 <h1 class="text-2xl font-bold">Receipt Lens</h1>
             </div>
             <p class="text-center text-indigo-200 text-sm">Instant Expense Logging</p>
@@ -77,380 +97,249 @@
             <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
                 <video id="video-stream" class="hidden rounded-lg" autoplay playsinline></video>
                 <img id="captured-image" class="hidden w-full h-full object-contain rounded-lg" alt="Captured Receipt">
-                <div id="placeholder" class="text-gray-500 text-center animate-pulse-slow">
+                <div id="placeholder" class="text-gray-500 text-center">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                     <p id="placeholder-text" class="mt-2 text-sm font-medium">Authorize to begin</p>
+                     <p id="placeholder-text" class="mt-2 text-sm font-medium">Loading...</p>
                 </div>
             </div>
         </div>
 
         <!-- Controls Area -->
         <div class="p-6 bg-gray-50">
-            <!-- Status Message Area -->
-            <div id="status-message-wrapper" class="text-center text-sm font-medium mb-4 h-10 flex items-center justify-center p-2 rounded-lg transition-all duration-300">
-                <p id="status-message"></p>
+            <div id="status-message-wrapper" class="text-center text-sm font-medium mb-4 h-10 flex items-center justify-center p-2 rounded-lg transition-all duration-300"><p id="status-message"></p></div>
+            
+            <!-- This section is shown to new users who need to complete the setup -->
+            <div id="config-section" class="hidden space-y-3">
+                 <p id="auth-instructions" class="text-center text-gray-700"></p>
+                 <button id="setup-btn" class="w-full flex items-center justify-center bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">Complete One-Time Setup</button>
             </div>
 
-            <!-- Configuration Section -->
-            <div id="config-section" class="space-y-3">
-                 <button id="authorize-btn" disabled class="w-full flex items-center justify-center bg-gray-400 text-white font-bold py-3 px-4 rounded-lg cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    Loading Services...
-                 </button>
+            <!-- This section is shown after setup is complete but before sign-in -->
+            <div id="auth-section" class="hidden space-y-3">
+                 <button id="authorize-btn" class="w-full flex items-center justify-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">Sign In & Authorize</button>
             </div>
 
-            <div id="initial-controls" class="hidden flex-col space-y-3">
-                <button id="start-scan-btn" class="w-full flex items-center justify-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
-                    Scan New Receipt
-                </button>
-            </div>
-
-            <div id="capture-controls" class="hidden flex flex-col space-y-3">
-                 <button id="capture-btn" class="w-full flex items-center justify-center bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /></svg>
-                    Capture Photo
-                </button>
-                 <button id="stop-scan-btn" class="w-full flex items-center justify-center bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                    Cancel
-                </button>
-            </div>
-
-            <div id="final-controls" class="hidden grid grid-cols-2 gap-3">
-                <button id="retake-btn" class="w-full flex items-center justify-center bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.181-3.183m-4.991-2.695v-2.695" /></svg>
-                    Retake
-                </button>
-                <button id="upload-btn" class="w-full flex items-center justify-center bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3v11.25" /></svg>
-                    Process & Save
-                </button>
-            </div>
+            <!-- This section is shown after the user is fully authenticated -->
+            <div id="initial-controls" class="hidden flex-col space-y-3"><button id="start-scan-btn" class="w-full flex items-center justify-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"><svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>Scan New Receipt</button></div>
+            <div id="capture-controls" class="hidden flex flex-col space-y-3"><button id="capture-btn" class="w-full flex items-center justify-center bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"><svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /></svg>Capture Photo</button><button id="stop-scan-btn" class="w-full flex items-center justify-center bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"><svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>Cancel</button></div>
+            <div id="final-controls" class="hidden grid grid-cols-2 gap-3"><button id="retake-btn" class="w-full flex items-center justify-center bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-400 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"><svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.181-3.183m-4.991-2.695v-2.695" /></svg>Retake</button><button id="upload-btn" class="w-full flex items-center justify-center bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"><svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3v11.25" /></svg>Process & Save</button></div>
         </div>
     </div>
-    
     <canvas id="canvas" class="hidden"></canvas>
-
     <script>
-    // =================================================================================
-    // --- IMPORTANT: PASTE YOUR CREDENTIALS HERE ---
-    // =================================================================================
-    // 1. Get your Client ID from the Google Cloud Console (APIs & Services > Credentials).
-    const GOOGLE_API_CLIENT_ID = "PASTE_YOUR_GOOGLE_API_CLIENT_ID_HERE";
-    // 2. Get your Gemini API Key from Google AI Studio.
-    const GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY_HERE";
-    // 3. Get your Spreadsheet ID from the URL of your Google Sheet.
-    const SPREADSHEET_ID = "PASTE_YOUR_GOOGLE_SHEET_ID_HERE";
-    // 4. Enter the name of the sheet (tab) you want to write to.
-    const SHEET_NAME = "Receipt";
-    // =================================================================================
+        // --- App Configuration ---
+        let GOOGLE_API_CLIENT_ID = "";
+        let GEMINI_API_KEY = "";
+        let SPREADSHEET_ID = "";
+        const SHEET_NAME = "Receipt";
 
-    // --- Element References ---
-    // This section gets references to all the HTML elements we need to interact with.
-    const video = document.getElementById('video-stream');
-    const canvas = document.getElementById('canvas');
-    const capturedImage = document.getElementById('captured-image');
-    const placeholder = document.getElementById('placeholder');
-    const placeholderText = document.getElementById('placeholder-text');
-    const statusMessage = document.getElementById('status-message');
-    const statusMessageWrapper = document.getElementById('status-message-wrapper');
-    const authInstructions = document.getElementById('auth-instructions');
+        // --- Element References ---
+        const video = document.getElementById('video-stream');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('captured-image');
+        const placeholder = document.getElementById('placeholder');
+        const placeholderText = document.getElementById('placeholder-text');
+        const statusMessage = document.getElementById('status-message');
+        const statusMessageWrapper = document.getElementById('status-message-wrapper');
+        const configSection = document.getElementById('config-section');
+        const authSection = document.getElementById('auth-section');
+        const setupBtn = document.getElementById('setup-btn');
+        const authorizeBtn = document.getElementById('authorize-btn');
+        const initialControls = document.getElementById('initial-controls');
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const captureControls = document.getElementById('capture-controls');
+        const finalControls = document.getElementById('final-controls');
+        const stopScanBtn = document.getElementById('stop-scan-btn');
+        const captureBtn = document.getElementById('capture-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const uploadBtn = document.getElementById('upload-btn');
 
-    // Control Buttons
-    const configSection = document.getElementById('config-section');
-    const authorizeBtn = document.getElementById('authorize-btn');
-    const initialControls = document.getElementById('initial-controls');
-    const startScanBtn = document.getElementById('start-scan-btn');
-    const captureControls = document.getElementById('capture-controls');
-    const finalControls = document.getElementById('final-controls');
-    const stopScanBtn = document.getElementById('stop-scan-btn');
-    const captureBtn = document.getElementById('capture-btn');
-    const retakeBtn = document.getElementById('retake-btn');
-    const uploadBtn = document.getElementById('upload-btn');
+        let stream = null, gapiClient, tokenClient, isAuthenticated = false;
 
-    // Global variables to hold the camera stream and API clients.
-    let stream = null;
-    let gapiClient;
-    let tokenClient;
-    let isAuthenticated = false;
-
-    // --- Initialization ---
-    // This function runs as soon as the page loads.
-    window.onload = () => {
-        // It loads the Google API client library.
-        gapi.load('client', initializeGapiClient);
-    };
-
-    // This function initializes the Google Sheets and Authentication clients.
-    async function initializeGapiClient() {
-        try {
-            // Initialize the main Google API client.
-            await gapi.client.init({
-                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-            });
-            gapiClient = gapi.client;
-
-            // Initialize the OAuth client for handling user sign-in.
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: GOOGLE_API_CLIENT_ID,
-                scope: 'https://www.googleapis.com/auth/spreadsheets',
-                callback: (tokenResponse) => {
-                    // This function is called automatically after a successful sign-in.
-                    if (tokenResponse && tokenResponse.access_token) {
-                        isAuthenticated = true;
-                        updateUiToAuthorizedState();
-                    }
-                },
-            });
-            console.log("GAPI and Token clients initialized.");
-            
-            // Attempt a "silent" sign-in when the page loads.
-            // If the user has signed in before, this will work automatically.
-            tokenClient.requestAccessToken({prompt: ''});
-
-            // Wait a couple of seconds to see if the silent sign-in was successful.
-            setTimeout(() => {
-                if (!isAuthenticated) {
-                    // If not, show the manual sign-in button.
-                    updateUiToNeedsAuthState();
+        // --- Initialization ---
+        window.onload = () => {
+            if (window.location.hash.startsWith('#credentials=')) {
+                const encodedCreds = window.location.hash.substring('#credentials='.length);
+                try {
+                    const creds = JSON.parse(atob(encodedCreds));
+                    localStorage.setItem('receiptLensCreds', JSON.stringify(creds));
+                    window.location.hash = '';
+                    window.location.reload();
+                    return;
+                } catch (e) {
+                    console.error("Could not parse credentials from URL hash", e);
                 }
-            }, 2500);
+            }
+            
+            loadCredentials();
 
-        } catch (error) {
-            console.error("Error during initialization:", error);
-            updateUiToNeedsAuthState("Initialization failed.");
-        }
-    }
-
-    // --- Authentication ---
-    // This function is called when the user clicks the "Sign In" button.
-    authorizeBtn.addEventListener('click', () => {
-        if (tokenClient) {
-            // It triggers the Google Sign-In popup window.
-            tokenClient.requestAccessToken({prompt: 'consent'});
-        }
-    });
-    
-    // This function updates the UI after a successful sign-in.
-    function updateUiToAuthorizedState() {
-        configSection.classList.add('hidden');
-        initialControls.classList.remove('hidden');
-        statusMessage.textContent = "Ready to scan.";
-        placeholderText.textContent = "Ready to scan a new receipt.";
-        placeholder.classList.remove('animate-pulse-slow');
-    }
-
-    // This function updates the UI if the user needs to sign in manually.
-    function updateUiToNeedsAuthState(message = "You must authorize the app to access Google Sheets.") {
-        authorizeBtn.disabled = false;
-        authorizeBtn.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg> Sign In & Authorize`;
-    }
-
-    // --- UI State Management ---
-    // This function controls which set of buttons is visible at any given time.
-    function showState(state) {
-        initialControls.classList.add('hidden');
-        captureControls.classList.add('hidden');
-        finalControls.classList.add('hidden');
-        video.classList.add('hidden');
-        capturedImage.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        
-        // Stop the camera stream if it's running.
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-
-        switch (state) {
-            case 'initial':
-                initialControls.classList.remove('hidden');
-                statusMessage.textContent = 'Ready to scan.';
-                break;
-            case 'scanning':
-                captureControls.classList.remove('hidden');
-                video.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                startVideoStream();
-                break;
-            case 'captured':
-                finalControls.classList.remove('hidden');
-                capturedImage.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                statusMessage.textContent = 'Review image, then process.';
-                break;
-        }
-    }
-
-    // --- Event Listeners ---
-    // These lines connect the buttons to their respective functions.
-    startScanBtn.addEventListener('click', () => showState('scanning'));
-    stopScanBtn.addEventListener('click', () => showState('initial'));
-    retakeBtn.addEventListener('click', () => showState('scanning'));
-    captureBtn.addEventListener('click', capturePhoto);
-    uploadBtn.addEventListener('click', processAndSave);
-
-    // --- Core Functions ---
-    // This function requests access to the user's camera.
-    async function startVideoStream() {
-        statusMessage.textContent = 'Starting camera...';
-        try {
-            const constraints = { video: { facingMode: 'environment' } }; // Prefer the rear camera
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            video.onloadedmetadata = () => { statusMessage.textContent = 'Camera active.'; };
-        } catch (err) {
-            console.error("Camera Error:", err);
-            statusMessage.textContent = 'Camera access denied or unavailable.';
-            showState('initial');
-        }
-    }
-
-    // This function captures a frame from the video stream and displays it as an image.
-    function capturePhoto() {
-        statusMessage.textContent = 'Capturing...';
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        capturedImage.src = canvas.toDataURL('image/jpeg', 0.9);
-        showState('captured');
-    }
-
-    // This is the main function that orchestrates the AI analysis and saving to Sheets.
-    async function processAndSave() {
-        statusMessage.textContent = 'Analyzing with AI...';
-        statusMessageWrapper.classList.add('bg-blue-100', 'text-blue-800');
-        finalControls.classList.add('hidden');
-
-        // Convert the captured image to a Base64 string for the API call.
-        const base64ImageData = capturedImage.src.split(',')[1];
-
-        try {
-            // Call the Gemini AI to analyze the image.
-            const extractedData = await analyzeReceiptWithGemini(base64ImageData);
-            if (!extractedData) throw new Error("AI could not extract data.");
-            statusMessage.textContent = 'Data extracted! Saving to sheet...';
-
-            // Save the extracted data to Google Sheets.
-            await appendToGoogleSheet(extractedData);
-            statusMessageWrapper.classList.remove('bg-blue-100', 'text-blue-800');
-            statusMessageWrapper.classList.add('bg-green-100', 'text-green-800');
-            statusMessage.textContent = '✅ Success! Saved to Google Sheets.';
-
-        } catch (error) {
-            console.error('Processing failed:', error);
-            statusMessageWrapper.classList.remove('bg-blue-100', 'text-blue-800');
-            statusMessageWrapper.classList.add('bg-red-100', 'text-red-800');
-            statusMessage.textContent = `❌ Error: ${error.message}`;
-        } finally {
-            // Reset the UI after a few seconds.
-            setTimeout(() => {
-                statusMessageWrapper.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
-                showState('initial')
-            }, 3000);
-        }
-    }
-
-    // This function sends the image data and a detailed prompt to the Gemini AI.
-    async function analyzeReceiptWithGemini(base64ImageData) {
-        const model = 'gemini-1.5-flash-latest';
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-        
-        const prompt = `
-            Thoroughly analyze the receipt image and extract a detailed breakdown.
-            Respond ONLY with a valid JSON object. For any value that cannot be found, use "N/A".
-            The JSON object must have the following keys:
-            - vendor: The name of the store or business.
-            - transactionDate: The date of the transaction in YYYY-MM-DD format.
-            - transactionTime: The time of the transaction.
-            - paymentType: The method of payment (e.g., "Credit Card", "Cash", "Debit").
-            - subtotal: The total amount before tax.
-            - tax: The total tax amount.
-            - grandTotal: The final total amount paid.
-            - items: An array of objects for each line item. Each object must have:
-                - description: The full name or description of the item.
-                - quantity: The quantity of the item.
-                - unitPrice: The price for a single unit of the item.
-        `;
-
-        const payload = {
-            contents: [{
-                parts: [
-                    { text: prompt },
-                    { inline_data: { mime_type: 'image/jpeg', data: base64ImageData } }
-                ]
-            }]
+            if (!GEMINI_API_KEY || !GOOGLE_API_CLIENT_ID || !SPREADSHEET_ID) {
+                showSetupState();
+            } else {
+                gapi.load('client', initializeGapiClient);
+            }
         };
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+        function loadCredentials() {
+            const storedCreds = localStorage.getItem('receiptLensCreds');
+            if (storedCreds) {
+                const creds = JSON.parse(storedCreds);
+                GOOGLE_API_CLIENT_ID = creds.clientId;
+                GEMINI_API_KEY = creds.geminiKey;
+                SPREADSHEET_ID = creds.sheetId;
+            }
+        }
+
+        function showSetupState() {
+            configSection.classList.remove('hidden');
+            authInstructions.textContent = "Welcome! Please complete the one-time setup to begin.";
+            placeholderText.textContent = "Setup Required";
+            setupBtn.onclick = () => window.location.href = "./helper.html";
+        }
+
+        async function initializeGapiClient() {
+            try {
+                await gapi.client.init({ discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"] });
+                gapiClient = gapi.client;
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_API_CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/spreadsheets',
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            isAuthenticated = true;
+                            updateUiToAuthorizedState();
+                        }
+                    },
+                });
+                tokenClient.requestAccessToken({ prompt: '' });
+                
+                setTimeout(() => {
+                    if (!isAuthenticated) {
+                        authSection.classList.remove('hidden');
+                        placeholderText.textContent = "Please sign in.";
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error during initialization:", error);
+                statusMessage.textContent = "Initialization failed.";
+            }
+        }
+
+        authorizeBtn.addEventListener('click', () => {
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: 'consent' });
         });
-
-        if (!response.ok) throw new Error(`Gemini API Error: ${response.statusText}`);
         
-        const result = await response.json();
-        const jsonString = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-        return JSON.parse(jsonString);
-    }
-
-    // This function formats the data from the AI and appends it to the Google Sheet.
-    async function appendToGoogleSheet(data) {
-        const photoTimestamp = new Date().toLocaleString();
-        const transactionId = `TID-${Date.now()}`;
-        const rows = [];
-
-        if (data.items && data.items.length > 0) {
-            // Create one row for each item on the receipt.
-            data.items.forEach((item, index) => {
-                const itemRow = [
-                    photoTimestamp,
-                    transactionId,
-                    data.vendor || 'N/A',
-                    data.transactionDate || 'N/A',
-                    data.transactionTime || 'N/A',
-                    data.paymentType || 'N/A',
-                    item.description || 'N/A',
-                    item.quantity || 1,
-                    item.unitPrice || 0.0,
-                    // Only write the totals on the first item's row to avoid duplication.
-                    index === 0 ? (data.subtotal || 0.0) : '',
-                    index === 0 ? (data.tax || 0.0) : '',
-                    index === 0 ? (data.grandTotal || 0.0) : ''
-                ];
-                rows.push(itemRow);
-            });
-        } else {
-            // If no items are found, create a single summary row.
-            const summaryRow = [
-                photoTimestamp,
-                transactionId,
-                data.vendor || 'N/A',
-                data.transactionDate || 'N/A',
-                data.transactionTime || 'N/A',
-                data.paymentType || 'N/A',
-                'N/A', 'N/A', 'N/A',
-                data.subtotal || 0.0,
-                data.tax || 0.0,
-                data.grandTotal || 0.0
-            ];
-            rows.push(summaryRow);
+        function updateUiToAuthorizedState() {
+            authSection.classList.add('hidden');
+            initialControls.classList.remove('hidden');
+            statusMessage.textContent = "Ready to scan.";
+            placeholderText.textContent = "Ready to scan a new receipt.";
         }
 
-        const params = {
-            spreadsheetId: SPREADSHEET_ID,
-            range: `${SHEET_NAME}!A:L`, 
-            valueInputOption: 'USER_ENTERED',
-            insertDataOption: 'INSERT_ROWS',
-        };
-        const valueRangeBody = {
-            majorDimension: 'ROWS',
-            values: rows
-        };
-        await gapiClient.sheets.spreadsheets.values.append(params, valueRangeBody);
-    }
+        function showState(state) {
+            [initialControls, captureControls, finalControls, video, capturedImage].forEach(el => el.classList.add('hidden'));
+            placeholder.classList.remove('hidden');
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            switch (state) {
+                case 'initial': initialControls.classList.remove('hidden'); statusMessage.textContent = 'Ready to scan.'; break;
+                case 'scanning': captureControls.classList.remove('hidden'); video.classList.remove('hidden'); placeholder.classList.add('hidden'); startVideoStream(); break;
+                case 'captured': finalControls.classList.remove('hidden'); capturedImage.classList.remove('hidden'); placeholder.classList.add('hidden'); statusMessage.textContent = 'Review image, then process.'; break;
+            }
+        }
+
+        startScanBtn.addEventListener('click', () => showState('scanning'));
+        stopScanBtn.addEventListener('click', () => showState('initial'));
+        retakeBtn.addEventListener('click', () => showState('scanning'));
+        captureBtn.addEventListener('click', capturePhoto);
+        uploadBtn.addEventListener('click', processAndSave);
+
+        async function startVideoStream() {
+            statusMessage.textContent = 'Starting camera...';
+            try {
+                const constraints = { video: { facingMode: 'environment' } };
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                video.onloadedmetadata = () => { statusMessage.textContent = 'Camera active.'; };
+            } catch (err) {
+                statusMessage.textContent = 'Camera access denied.';
+                showState('initial');
+            }
+        }
+
+        function capturePhoto() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedImage.src = canvas.toDataURL('image/jpeg', 0.9);
+            showState('captured');
+        }
+
+        async function processAndSave() {
+            statusMessage.textContent = 'Analyzing with AI...';
+            statusMessageWrapper.classList.add('bg-blue-100', 'text-blue-800');
+            finalControls.classList.add('hidden');
+            const base64ImageData = capturedImage.src.split(',')[1];
+            try {
+                const extractedData = await analyzeReceiptWithGemini(base64ImageData);
+                statusMessage.textContent = 'Data extracted! Saving to sheet...';
+                await appendToGoogleSheet(extractedData);
+                statusMessageWrapper.classList.remove('bg-blue-100');
+                statusMessageWrapper.classList.add('bg-green-100', 'text-green-800');
+                statusMessage.textContent = '✅ Success! Saved to Google Sheets.';
+            } catch (error) {
+                statusMessageWrapper.classList.remove('bg-blue-100');
+                statusMessageWrapper.classList.add('bg-red-100', 'text-red-800');
+                statusMessage.textContent = `❌ Error: ${error.message}`;
+            } finally {
+                setTimeout(() => {
+                    statusMessageWrapper.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+                    showState('initial');
+                }, 3000);
+            }
+        }
+
+        async function analyzeReceiptWithGemini(base64ImageData) {
+            const model = 'gemini-1.5-flash-latest';
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+            const prompt = `Thoroughly analyze the receipt image and extract a detailed breakdown. Respond ONLY with a valid JSON object. For any value that cannot be found, use "N/A". The JSON object must have the following keys: vendor, transactionDate (YYYY-MM-DD), transactionTime, paymentType, subtotal, tax, grandTotal, and an array of items with description, quantity, and unitPrice.`;
+            const payload = { contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: base64ImageData } }] }] };
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`Gemini API Error: ${response.statusText}`);
+            const result = await response.json();
+            const jsonString = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+            return JSON.parse(jsonString);
+        }
+
+        async function appendToGoogleSheet(data) {
+            const photoTimestamp = new Date().toLocaleString();
+            const transactionId = `TID-${Date.now()}`;
+            const rows = [];
+            if (data.items && data.items.length > 0) {
+                data.items.forEach((item, index) => {
+                    rows.push([
+                        photoTimestamp, transactionId, data.vendor || 'N/A', data.transactionDate || 'N/A',
+                        data.transactionTime || 'N/A', data.paymentType || 'N/A', item.description || 'N/A',
+                        item.quantity || 1, item.unitPrice || 0.0,
+                        index === 0 ? (data.subtotal || 0.0) : '',
+                        index === 0 ? (data.tax || 0.0) : '',
+                        index === 0 ? (data.grandTotal || 0.0) : ''
+                    ]);
+                });
+            } else {
+                rows.push([
+                    photoTimestamp, transactionId, data.vendor || 'N/A', data.transactionDate || 'N/A',
+                    data.transactionTime || 'N/A', data.paymentType || 'N/A', 'N/A', 'N/A', 'N/A',
+                    data.subtotal || 0.0, data.tax || 0.0, data.grandTotal || 0.0
+                ]);
+            }
+            const params = { spreadsheetId: SPREADSHEET_ID, range: `${SHEET_NAME}!A:L`, valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS' };
+            const valueRangeBody = { majorDimension: 'ROWS', values: rows };
+            await gapiClient.sheets.spreadsheets.values.append(params, valueRangeBody);
+        }
     </script>
 </body>
 </html>
